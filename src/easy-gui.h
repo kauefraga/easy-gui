@@ -116,9 +116,81 @@ namespace Window {
       m_text.setFillColor(color);
     }
 
+    // Sets a font.
+    void set_font(const sf::Font& font) {
+      m_text.setFont(font);
+    }
+
     // Draws the component on the screen.
     void draw(sf::RenderWindow& window) {
       window.draw(m_text);
+    }
+
+    Text() = default;
+  };
+
+  class RectButton {
+  private:
+    Window::Text m_button_label;
+    sf::Vector2i m_mouse_position_window;
+    sf::Vector2f m_mouse_position_view;
+    sf::Vector2f m_button_position;
+  public:
+    const sf::Color default_hovered = sf::Color(191, 191, 191);
+    const sf::Color default_pressed = sf::Color(153, 153, 153);
+    bool is_hover = false;
+    bool is_pressed = false;
+    bool is_active = true;
+    sf::RectangleShape m_button;
+
+    RectButton(Window::Text& text, const sf::Vector2f& size, const sf::Vector2f& position) {
+      m_button_label = text;
+
+      m_button.setSize(size);
+      m_button.setPosition(position);
+
+      m_button_position = position;
+    }
+
+    void get_button_status(sf::RenderWindow& window, sf::Event& event) {
+      m_mouse_position_window = sf::Mouse::getPosition(window);
+      m_mouse_position_view = window.mapPixelToCoords(m_mouse_position_window);
+
+      is_hover = false;
+      is_pressed = false;
+
+      if (is_active) {
+        if (m_button.getGlobalBounds().contains(m_mouse_position_view)) {
+          is_hover = true;
+        }
+
+        if (m_button.getGlobalBounds().contains(m_mouse_position_view)) {
+          if (event.type == sf::Event::MouseButtonReleased) {
+            is_pressed = true;
+          }
+        }
+
+        if (is_hover) {
+          m_button.setFillColor(default_hovered);
+        }
+        else m_button.setFillColor(sf::Color::White);
+
+        if (is_pressed) {
+          m_button.setFillColor(default_pressed);
+        }
+      }
+      else {
+        m_button.setFillColor(default_pressed);
+      }
+    }
+
+    void draw(sf::RenderWindow& window) {
+      window.draw(m_button);
+      m_button_label.draw(window);
+    }
+
+    void set_button_font(const sf::Font& font) {
+      m_button_label.set_font(font);
     }
   };
 }
